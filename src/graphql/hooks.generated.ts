@@ -2043,6 +2043,16 @@ export const ExportFileFragmentDoc = gql`
   url
 }
     `;
+export const ProductListAttributeFragmentDoc = gql`
+    fragment ProductListAttribute on SelectedAttribute {
+  attribute {
+    id
+  }
+  values {
+    ...AttributeValue
+  }
+}
+    ${AttributeValueFragmentDoc}`;
 export const ShippingMethodWithPostalCodesFragmentDoc = gql`
     fragment ShippingMethodWithPostalCodes on ShippingMethodType {
   id
@@ -12105,12 +12115,7 @@ export const ProductListDocument = gql`
         ...ProductWithChannelListings
         updatedAt
         attributes @include(if: $hasSelectedAttributes) {
-          attribute {
-            id
-          }
-          values {
-            ...AttributeValue
-          }
+          ...ProductListAttribute
         }
       }
     }
@@ -12124,7 +12129,7 @@ export const ProductListDocument = gql`
   }
 }
     ${ProductWithChannelListingsFragmentDoc}
-${AttributeValueFragmentDoc}`;
+${ProductListAttributeFragmentDoc}`;
 
 /**
  * __useProductListQuery__

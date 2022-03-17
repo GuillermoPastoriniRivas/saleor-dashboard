@@ -29,12 +29,6 @@ export type Scalars = {
    * String, Boolean, Int, Float, List or Object.
    */
   GenericScalar: any;
-  /**
-   * Allows use of a JSON String for input / output from the GraphQL schema.
-   *
-   * Use of this type is *not recommended* as you lose the benefits of having a defined, static
-   * schema (one of the key benefits of GraphQL).
-   */
   JSONString: any;
   /**
    * Positive Decimal scalar implementation.
@@ -668,6 +662,17 @@ export type CheckoutLineInput = {
   quantity: Scalars['Int'];
   /** ID of the product variant. */
   variantId: Scalars['ID'];
+  /** New in Saleor 3.1. Custom price of the item. Can be set only by apps with `HANDLE_CHECKOUTS` permission. When the line with the same variant will be provided multiple times, the last price will be used. Note: this feature is in a preview state and can be subject to changes at later point. */
+  price?: InputMaybe<Scalars['PositiveDecimal']>;
+};
+
+export type CheckoutLineUpdateInput = {
+  /** The number of items purchased. Optional for apps, required for any other users. */
+  quantity?: InputMaybe<Scalars['Int']>;
+  /** ID of the product variant. */
+  variantId: Scalars['ID'];
+  /** New in Saleor 3.1. Custom price of the item. Can be set only by apps with `HANDLE_CHECKOUTS` permission. When the line with the same variant will be provided multiple times, the last price will be used. Note: this feature is in a preview state and can be subject to changes at later point. */
+  price?: InputMaybe<Scalars['PositiveDecimal']>;
 };
 
 export enum CheckoutSortField {
@@ -1294,12 +1299,10 @@ export type ExportFileFilterInput = {
 };
 
 export enum ExportFileSortField {
-  /** Sort export file by status. */
   STATUS = 'STATUS',
-  /** Sort export file by created at. */
   CREATED_AT = 'CREATED_AT',
-  /** Sort export file by updated at. */
-  UPDATED_AT = 'UPDATED_AT'
+  UPDATED_AT = 'UPDATED_AT',
+  LAST_MODIFIED_AT = 'LAST_MODIFIED_AT'
 }
 
 export type ExportFileSortingInput = {
@@ -2531,7 +2534,8 @@ export enum MetadataErrorCode {
   GRAPHQL_ERROR = 'GRAPHQL_ERROR',
   INVALID = 'INVALID',
   NOT_FOUND = 'NOT_FOUND',
-  REQUIRED = 'REQUIRED'
+  REQUIRED = 'REQUIRED',
+  NOT_UPDATED = 'NOT_UPDATED'
 }
 
 export type MetadataFilter = {
@@ -2588,6 +2592,24 @@ export type OrderAddNoteInput = {
   /** Note message. */
   message: Scalars['String'];
 };
+
+/** An enumeration. */
+export enum OrderCreateFromCheckoutErrorCode {
+  GRAPHQL_ERROR = 'GRAPHQL_ERROR',
+  NOT_FOUND = 'NOT_FOUND',
+  CHANNEL_INACTIVE = 'CHANNEL_INACTIVE',
+  INSUFFICIENT_STOCK = 'INSUFFICIENT_STOCK',
+  VOUCHER_NOT_APPLICABLE = 'VOUCHER_NOT_APPLICABLE',
+  GIFT_CARD_NOT_APPLICABLE = 'GIFT_CARD_NOT_APPLICABLE',
+  TAX_ERROR = 'TAX_ERROR',
+  SHIPPING_METHOD_NOT_SET = 'SHIPPING_METHOD_NOT_SET',
+  BILLING_ADDRESS_NOT_SET = 'BILLING_ADDRESS_NOT_SET',
+  SHIPPING_ADDRESS_NOT_SET = 'SHIPPING_ADDRESS_NOT_SET',
+  INVALID_SHIPPING_METHOD = 'INVALID_SHIPPING_METHOD',
+  NO_LINES = 'NO_LINES',
+  EMAIL_NOT_SET = 'EMAIL_NOT_SET',
+  UNAVAILABLE_VARIANT_IN_CHANNEL = 'UNAVAILABLE_VARIANT_IN_CHANNEL'
+}
 
 export enum OrderDirection {
   /** Specifies an ascending sort order. */
@@ -2842,8 +2864,20 @@ export type OrderSettingsUpdateInput = {
 export enum OrderSortField {
   /** Sort orders by number. */
   NUMBER = 'NUMBER',
-  /** Sort orders by creation date. */
+  /**
+   * Sort orders by creation date.
+   *
+   * DEPRECATED: this field will be removed in Saleor 4.0.
+   */
   CREATION_DATE = 'CREATION_DATE',
+  /**
+   * Sort orders by creation date.
+   *
+   * DEPRECATED: this field will be removed in Saleor 4.0.
+   */
+  CREATED_AT = 'CREATED_AT',
+  /** Sort orders by last modified at. */
+  LAST_MODIFIED_AT = 'LAST_MODIFIED_AT',
   /** Sort orders by customer. */
   CUSTOMER = 'CUSTOMER',
   /** Sort orders by payment. */
@@ -3444,6 +3478,10 @@ export enum ProductOrderField {
   PUBLISHED = 'PUBLISHED',
   /** Sort products by publication date. */
   PUBLICATION_DATE = 'PUBLICATION_DATE',
+  /** Sort products by publication date. */
+  PUBLISHED_AT = 'PUBLISHED_AT',
+  /** Sort products by update date. */
+  LAST_MODIFIED_AT = 'LAST_MODIFIED_AT',
   /** Sort products by collection. Note: This option is available only for the `Collection.products` query. */
   COLLECTION = 'COLLECTION',
   /** Sort products by rating. */
@@ -3591,6 +3629,18 @@ export type ProductVariantInput = {
   quantityLimitPerCustomer?: InputMaybe<Scalars['Int']>;
 };
 
+export enum ProductVariantSortField {
+  /** Sort products variants by last modified at. */
+  LAST_MODIFIED_AT = 'LAST_MODIFIED_AT'
+}
+
+export type ProductVariantSortingInput = {
+  /** Specifies the direction in which to sort products. */
+  direction: OrderDirection;
+  /** Sort productVariants by the selected field. */
+  field: ProductVariantSortField;
+};
+
 export type PublishableChannelListingInput = {
   /** ID of a channel. */
   channelId: Scalars['ID'];
@@ -3665,7 +3715,11 @@ export enum SaleSortField {
   /** Sort sales by value. */
   VALUE = 'VALUE',
   /** Sort sales by type. */
-  TYPE = 'TYPE'
+  TYPE = 'TYPE',
+  /** Sort sales by created at. */
+  CREATED_AT = 'CREATED_AT',
+  /** Sort sales by last modified at. */
+  LAST_MODIFIED_AT = 'LAST_MODIFIED_AT'
 }
 
 export type SaleSortingInput = {
@@ -4067,7 +4121,11 @@ export enum UserSortField {
   /** Sort users by email. */
   EMAIL = 'EMAIL',
   /** Sort users by order count. */
-  ORDER_COUNT = 'ORDER_COUNT'
+  ORDER_COUNT = 'ORDER_COUNT',
+  /** Sort users by created at. */
+  CREATED_AT = 'CREATED_AT',
+  /** Sort users by last modified at. */
+  LAST_MODIFIED_AT = 'LAST_MODIFIED_AT'
 }
 
 export type UserSortingInput = {
@@ -4287,6 +4345,8 @@ export type WebhookCreateInput = {
   isActive?: InputMaybe<Scalars['Boolean']>;
   /** The secret key used to create a hash signature with each payload. */
   secretKey?: InputMaybe<Scalars['String']>;
+  /** New in Saleor 3.2. Subscription query used to define a webhook payload. Note: this feature is in a preview state and can be subject to changes at later point. */
+  query?: InputMaybe<Scalars['String']>;
 };
 
 /** An enumeration. */
@@ -4500,6 +4560,8 @@ export type WebhookUpdateInput = {
   isActive?: InputMaybe<Scalars['Boolean']>;
   /** Use to create a hash signature with each payload. */
   secretKey?: InputMaybe<Scalars['String']>;
+  /** New in Saleor 3.2. Subscription query used to define a webhook payload. Note: this feature is in a preview state and can be subject to changes at later point. */
+  query?: InputMaybe<Scalars['String']>;
 };
 
 /** An enumeration. */
@@ -5578,6 +5640,8 @@ export type SelectedVariantAttributeFragment = { __typename: 'SelectedAttribute'
 export type ProductVariantFragment = { __typename: 'ProductVariant', id: string, name: string, sku: string | null, trackInventory: boolean, quantityLimitPerCustomer: number | null, selectionAttributes: Array<{ __typename: 'SelectedAttribute', attribute: { __typename: 'Attribute', id: string, name: string | null, slug: string | null, inputType: AttributeInputTypeEnum | null, entityType: AttributeEntityTypeEnum | null, valueRequired: boolean, unit: MeasurementUnitsEnum | null, choices: { __typename: 'AttributeValueCountableConnection', pageInfo: { __typename: 'PageInfo', endCursor: string | null, hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null }, edges: Array<{ __typename: 'AttributeValueCountableEdge', cursor: string, node: { __typename: 'AttributeValue', richText: any | null, id: string, name: string | null, slug: string | null, reference: string | null, boolean: boolean | null, date: any | null, dateTime: any | null, value: string | null, file: { __typename: 'File', url: string, contentType: string | null } | null } }> } | null }, values: Array<{ __typename: 'AttributeValue', richText: any | null, id: string, name: string | null, slug: string | null, reference: string | null, boolean: boolean | null, date: any | null, dateTime: any | null, value: string | null, file: { __typename: 'File', url: string, contentType: string | null } | null }> }>, nonSelectionAttributes: Array<{ __typename: 'SelectedAttribute', attribute: { __typename: 'Attribute', id: string, name: string | null, slug: string | null, inputType: AttributeInputTypeEnum | null, entityType: AttributeEntityTypeEnum | null, valueRequired: boolean, unit: MeasurementUnitsEnum | null, choices: { __typename: 'AttributeValueCountableConnection', pageInfo: { __typename: 'PageInfo', endCursor: string | null, hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null }, edges: Array<{ __typename: 'AttributeValueCountableEdge', cursor: string, node: { __typename: 'AttributeValue', richText: any | null, id: string, name: string | null, slug: string | null, reference: string | null, boolean: boolean | null, date: any | null, dateTime: any | null, value: string | null, file: { __typename: 'File', url: string, contentType: string | null } | null } }> } | null }, values: Array<{ __typename: 'AttributeValue', richText: any | null, id: string, name: string | null, slug: string | null, reference: string | null, boolean: boolean | null, date: any | null, dateTime: any | null, value: string | null, file: { __typename: 'File', url: string, contentType: string | null } | null }> }>, media: Array<{ __typename: 'ProductMedia', id: string, url: string, type: ProductMediaType, oembedData: any }> | null, product: { __typename: 'Product', id: string, name: string, defaultVariant: { __typename: 'ProductVariant', id: string } | null, media: Array<{ __typename: 'ProductMedia', id: string, alt: string, sortOrder: number | null, url: string, type: ProductMediaType, oembedData: any }> | null, thumbnail: { __typename: 'Image', url: string } | null, channelListings: Array<{ __typename: 'ProductChannelListing', publicationDate: any | null, isPublished: boolean, channel: { __typename: 'Channel', id: string, name: string, currencyCode: string } }> | null, variants: Array<{ __typename: 'ProductVariant', id: string, name: string, sku: string | null, media: Array<{ __typename: 'ProductMedia', id: string, url: string, type: ProductMediaType, oembedData: any }> | null }> | null }, channelListings: Array<{ __typename: 'ProductVariantChannelListing', channel: { __typename: 'Channel', id: string, name: string, currencyCode: string }, price: { __typename: 'Money', amount: number, currency: string } | null, costPrice: { __typename: 'Money', amount: number, currency: string } | null, preorderThreshold: { __typename: 'PreorderThreshold', quantity: number | null, soldUnits: number } | null }> | null, stocks: Array<{ __typename: 'Stock', id: string, quantity: number, quantityAllocated: number, warehouse: { __typename: 'Warehouse', id: string, name: string } }> | null, preorder: { __typename: 'PreorderData', globalThreshold: number | null, globalSoldUnits: number, endDate: any | null } | null, weight: { __typename: 'Weight', unit: WeightUnitsEnum, value: number } | null, metadata: Array<{ __typename: 'MetadataItem', key: string, value: string }>, privateMetadata: Array<{ __typename: 'MetadataItem', key: string, value: string }> };
 
 export type ExportFileFragment = { __typename: 'ExportFile', id: string, status: JobStatusEnum, url: string | null };
+
+export type ProductListAttributeFragment = { __typename: 'SelectedAttribute', attribute: { __typename: 'Attribute', id: string }, values: Array<{ __typename: 'AttributeValue', id: string, name: string | null, slug: string | null, reference: string | null, boolean: boolean | null, date: any | null, dateTime: any | null, value: string | null, file: { __typename: 'File', url: string, contentType: string | null } | null }> };
 
 export type ShippingZoneFragment = { __typename: 'ShippingZone', id: string, name: string, description: string | null, countries: Array<{ __typename: 'CountryDisplay', code: string, country: string }> | null, metadata: Array<{ __typename: 'MetadataItem', key: string, value: string }>, privateMetadata: Array<{ __typename: 'MetadataItem', key: string, value: string }> };
 
