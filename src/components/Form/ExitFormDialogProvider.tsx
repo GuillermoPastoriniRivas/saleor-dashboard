@@ -35,16 +35,9 @@ interface FormData {
 
 // Do not use this context directly in components
 // use useExitFormDialog hook instead
-export const ExitFormDialogContext = React.createContext<ExitFormDialogData>({
-  setIsDirty: () => undefined,
-  setEnableExitDialog: () => undefined,
-  setExitDialogSubmitRef: () => undefined,
-  shouldBlockNavigation: () => false,
-  setIsSubmitting: () => undefined,
-  submit: () => Promise.resolve([]),
-  leave: () => undefined,
-  setIsSubmitDisabled: () => undefined
-});
+export const ExitFormDialogContext = React.createContext<ExitFormDialogData>(
+  undefined
+);
 
 const defaultValues = {
   isDirty: false,

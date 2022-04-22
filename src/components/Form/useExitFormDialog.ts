@@ -25,6 +25,13 @@ export const useExitFormDialog = (
   const id = useRef(formId || Symbol()).current;
 
   const exitDialogProps = useContext(ExitFormDialogContext);
+
+  if (!exitDialogProps) {
+    throw new Error(
+      "useExitFormDialog needs to be called within ExitFormDialogContext"
+    );
+  }
+
   const {
     setIsDirty,
     setIsSubmitDisabled,
